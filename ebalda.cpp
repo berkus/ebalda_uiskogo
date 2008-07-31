@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 Ebalda::Ebalda()
   : name(0)
@@ -36,15 +37,22 @@ void Ebalda::allocate_himself()
 
 void Ebalda::dump()
 {
-	fprintf(stderr, "Wild ebalda: %s @ %d (%d)\n"
-	                " Head @ %d x %d\n"
-					" Width %d x %d\n"
+	fprintf(stderr, "Wild ebalda: %s @ step %d (grown: %d)\n"
+					" Height %d x Width %d\n"
+					" Head @ %d x %d\n"
 					" Start @ %d x %d\n"
-					" End @ %d x %d\n", name, step, grown, headrow, headcol, width, height, startrow, startcol, endrow, endcol);
+					" End @ %d x %d\n", name, step, grown,
+					height, width,
+					headrow, headcol,
+					startrow, startcol,
+					endrow, endcol);
 	for(int row = startrow; row <= endrow; row++)
 	{
 	  for(int col = startcol; col <= endcol; col++)
-		  fprintf(stderr, "%c", (row == headrow && col == headcol) ? '*' : ebalda_himself[ (width * 2) * row + col ]);
+	  {
+		char c = ebalda_himself[ (width * 2) * row + col ];
+		fprintf(stderr, "%c", (row == headrow && col == headcol) ? toupper(c) : tolower(c));
+	  }
 		fprintf(stderr, "\n");
 	}
 	fprintf(stderr, "\n");
@@ -60,7 +68,8 @@ void Ebalda::Hatch(const char *n)
 	headrow = headcol = 1; // At first, it's only the head.
 	startrow = startcol = 1;
 	endrow = endcol = 1;
-	ebalda_himself[ (width + 2) * headrow + headcol ] = 'A';
+	ebalda_himself[ (width + 2) * headrow + headcol ] = 'B';
+	grown = false;
 	// Now you can save your newly hatched ebalda and let it live!
 }
 
@@ -107,8 +116,8 @@ bool Ebalda::LoadState(const char *fname)
 	allocate_himself();
 
 	startrow = startcol = 1;
-	endrow = width;
-	endcol = height;
+	endrow = height;
+	endcol = width;
 	grown = false;
 	if (headrow == 0) headrow = 1;
 	if (headcol == 0) headcol = 1;
@@ -140,9 +149,9 @@ void Ebalda::SaveState(const char *fname)
 	fwrite(&step, 4, 1, file);
 	fwrite(&headrow, 2, 1, file);
 	fwrite(&headcol, 2, 1, file);
-	temp = endcol - startcol + 1;
+	temp = endcol - startcol + 1; // new width
 	fwrite(&temp, 2, 1, file);
-	temp = endrow - startrow + 1;
+	temp = endrow - startrow + 1; // new height
 	fwrite(&temp, 2, 1, file);
 
 	// Now the funky write loop.
@@ -163,6 +172,7 @@ void Ebalda::Grow()
 	int which = rand() % 2;
 	int dir = rand() % 2;
 
+	fprintf(stderr, "Prev row: %d prev col: %d\n", headrow, headcol);
 	if (which == 0)
 	{
 		// change row
@@ -181,6 +191,7 @@ void Ebalda::Grow()
 		else if (headcol > endcol)
 			endcol++;
 	}
+	fprintf(stderr, "Next row: %d next col: %d\n\n", headrow, headcol);
 
 	char *p = &ebalda_himself[ (width + 2) * headrow + headcol ];
 	(*p)++;

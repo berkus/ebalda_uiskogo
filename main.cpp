@@ -11,8 +11,9 @@ int main(int, char **)
 
 	Ebalda ebalda;
 
-//	ebalda.Hatch("Jfgzoza"); // uncomment these two lines to make a new one
-//	ebalda.SaveState("jfgzoza.state");
+// 	ebalda.Hatch("Jfgzoza"); // uncomment these two lines to make a new one
+// 	ebalda.Grow();
+// 	ebalda.SaveState("jfgzoza.state");
 
 	if (ebalda.LoadState("jfgzoza.state"))
 	{
