@@ -22,6 +22,10 @@ class Ebalda
 		short headrow, headcol;
 		short width, height;
 		char *ebalda_himself; // this array is allocated with +2 rows and +2 columns to accomodate for ebalda sudden growth.
+		short startrow, startcol;
+		short endrow, endcol;
+
+		void allocate_himself();
 };
 
 #endif

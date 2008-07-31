@@ -1,4 +1,7 @@
 #include "ebalda.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 Ebalda::Ebalda()
   : name(0)
@@ -25,13 +28,14 @@ void Ebalda::allocate_himself()
 	if (width > 0 && height > 0)
 	{
 		ebalda_himself = new char [ (width + 2) * (height + 2) ];
+		memset(ebalda_himself, 'A', (width + 2) * (height + 2));
 	}
 }
 
 // Hatch a fresh new ebalda with a name.
-void Ebalda::Hatch(const char *name)
+void Ebalda::Hatch(const char *n)
 {
-	name = strdup(name);
+	name = strdup(n);
 	width = height = 1;
 	allocate_himself();
 	step = 0;
@@ -67,17 +71,18 @@ void Ebalda::LoadState(const char *fname)
 // Save ebalda to file.
 void Ebalda::SaveState(const char *fname)
 {
-	file = fopen(fname, "wb");
+	FILE *file = fopen(fname, "wb");
 	if (!file)
 		return;
 
+	short temp;
 	fwrite("EBAlDA", 6, 1, file);
-	fwrite(strlen(name)+1, 1, 1, file);
+	temp = strlen(name) + 1; // ughmm, this relies on a) strlen(name) being < 255, b) x86 arch to take address of LSB of temp
+	fwrite(&temp, 1, 1, file); // NOT PORTABLE
 	fwrite(name, strlen(name)+1, 1, file);
 	fwrite(&step, 4, 1, file);
 	fwrite(&headrow, 2, 1, file);
 	fwrite(&headcol, 2, 1, file);
-	short temp;
 	temp = endcol - startcol + 1;
 	fwrite(&temp, 2, 1, file);
 	temp = endrow - startrow + 1;
@@ -114,6 +119,12 @@ void Ebalda::Grow()
 		else if (headcol > endcol)
 			endcol++;
 	}
+
+	char *p = &ebalda_himself[ (width + 2) * headrow + headcol ];
+	*p++;
+	if (*p > 'Y') *p = 'Y';
+
+	step++;
 }
 
 void Ebalda::Draw(const char *outfile)

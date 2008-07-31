@@ -6,7 +6,7 @@
 // or
 // ebalda filename.dmp
 
-int main(int argc, char *argv)
+int main(int argc, char **argv)
 {
 	// Seed RNG.
 	timeval tt;
@@ -15,5 +15,6 @@ int main(int argc, char *argv)
 
 	Ebalda ebalda;
 	ebalda.Hatch("Jfgzoza");
+	ebalda.Grow();
 	ebalda.SaveState("jfgzoza.state");
 }
