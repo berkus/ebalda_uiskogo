@@ -106,7 +106,7 @@ bool Ebalda::LoadState(const char *fname)
 	fprintf(stderr, "Loaded field:\n");
 	for(int row = startrow; row <= endrow; row++)
 	{
-	  for(int col = startcol; row <= endcol; col++)
+	  for(int col = startcol; col <= endcol; col++)
 		  fprintf(stderr, "%c", (row == headrow && col == headcol) ? '*' : ebalda_himself[ (width * 2) * row + col ]);
 		fprintf(stderr, "\n");
 	}
@@ -144,7 +144,7 @@ void Ebalda::SaveState(const char *fname)
 	fprintf(stderr, "Transformed field:\n");
 	for(int row = startrow; row <= endrow; row++)
 	{
-	  for(int col = startcol; row <= endcol; col++)
+	  for(int col = startcol; col <= endcol; col++)
 		  fprintf(stderr, "%c", (row == headrow && col == headcol) ? '*' : ebalda_himself[ (width * 2) * row + col ]);
 		fprintf(stderr, "\n");
 	}
