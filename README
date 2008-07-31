@@ -1,0 +1,7 @@
+To compile: have GD dev libs installed and type make.
+
+To create new ebalda: edit main.cpp and uncomment the Hatch and SaveState lines. Give your ebalda a fancy name!
+To continue breeding - comment out these lines and recompile again.
+
+Measured speed without PNG files output: about 1000 iterations in 4 seconds.
+There's plenty of room for improvement, feel free to send patches.
