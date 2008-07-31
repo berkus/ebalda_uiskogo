@@ -1,4 +1,6 @@
 #include "ebalda.h"
+#include "config.h"
+#include <gd.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -35,6 +37,7 @@ void Ebalda::allocate_himself()
 	}
 }
 
+#ifdef DEBUG
 void Ebalda::dump()
 {
 	fprintf(stderr, "Wild ebalda: %s @ step %d (grown: %d)\n"
@@ -60,6 +63,7 @@ void Ebalda::dump()
 	}
 	fprintf(stderr, "\n");
 }
+#endif
 
 // Hatch a fresh new ebalda with a name.
 void Ebalda::Hatch(const char *n)
@@ -125,20 +129,26 @@ bool Ebalda::LoadState(const char *fname)
 	if (headrow == 0) headrow = 1;
 	if (headcol == 0) headcol = 1;
 
+#ifdef DEBUG
 	fprintf(stderr, "**BEFORE LOAD**\n");
 	dump();
+#endif
 
 	// Now the funky read loop.
 	for(int row = startrow; row <= endrow; row++)
 	{
+#ifdef DEBUG
 	    fprintf(stderr, "reading at %d for %d\n",(width + 2) * row + startcol, endcol - startcol + 1);
+#endif
 	  fread(&ebalda_himself[ (width + 2) * row + startcol ], endcol - startcol + 1, 1, file);
 	}
 
 	fclose(file);
 
+#ifdef DEBUG
 	fprintf(stderr, "**LOADED**\n");
 	dump();
+#endif
 
 	return true;
 }
@@ -169,8 +179,10 @@ void Ebalda::SaveState(const char *fname)
 
 	fclose(file);
 
+#ifdef DEBUG
 	fprintf(stderr, "**TRANSFORMED**\n");
 	dump();
+#endif
 }
 
 void Ebalda::Grow()
@@ -181,7 +193,9 @@ void Ebalda::Grow()
 	int which = rand() % 2;
 	int dir = rand() % 2;
 
+#ifdef DEBUG
 	fprintf(stderr, "Prev row: %d prev col: %d\n", headrow, headcol);
+#endif
 	if (which == 0)
 	{
 		// change row
@@ -200,11 +214,13 @@ void Ebalda::Grow()
 		else if (headcol > endcol)
 			endcol++;
 	}
+#ifdef DEBUG
 	fprintf(stderr, "Next row: %d next col: %d\n\n", headrow, headcol);
+#endif
 
 	char *p = &ebalda_himself[ (width + 2) * headrow + headcol ];
 	(*p)++;
-	if (*p > 'Y') *p = 'Y';
+	if (*p > 'J') *p = 'J';
 
 	step++;
 	grown = true;
@@ -212,4 +228,36 @@ void Ebalda::Grow()
 
 void Ebalda::Draw(const char *outfile)
 {
+    gdImagePtr im;
+    FILE *pngout;
+    int black, white;
+    char buf[512];
+    
+    snprintf(buf, 512, "%s Age: %d Size %d x %d", name, step, endcol - startcol + 1, endrow - startrow + 1);
+    
+    im = gdImageCreateTrueColor((width + 1) * DOT_SIZE, (height + 1) * DOT_SIZE + 20);
+    white = gdImageColorAllocate(im, 255, 255, 255); // first allocated color is background
+    black = gdImageColorAllocate(im, 0, 0, 0);
+    
+    int brect[8];
+    gdImageStringFT(im, brect, white, (char *)FONT_FILE, 11.0, 0.0, /*x*/5, /*y*/(height + 1) * DOT_SIZE + 10, buf);
+
+    for(int row = startrow; row <= endrow; row++)
+    {
+	for(int col = startcol; col <= endcol; col++)
+	{
+	    int color;
+	    int c = ebalda_himself[ (width + 2) * row + col ] - 'A';
+	    if (row == headrow && col == headcol) color = gdImageColorAllocate(im, 255, 0, 0);
+	    else                                  color = gdImageColorAllocate(im, 250 - c * 25, 250 - c * 25, 250 - c * 25);
+	    gdImageFilledRectangle(im, (col - startcol) * DOT_SIZE, (row - startrow) * DOT_SIZE,
+	                               (col - startcol) * DOT_SIZE + DOT_SIZE - 1, (row - startrow) * DOT_SIZE + DOT_SIZE - 1, color);
+	}
+    }
+
+    pngout = fopen(outfile, "wb");
+    gdImagePng(im, pngout);
+    
+    fclose(pngout);
+    gdImageDestroy(im);
 }

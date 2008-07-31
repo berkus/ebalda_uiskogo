@@ -1,4 +1,5 @@
 #include "ebalda.h"
+#include "config.h"
 #include <sys/time.h>
 #include <stdlib.h>
 
@@ -18,6 +19,7 @@ int main(int, char **)
 	if (ebalda.LoadState("jfgzoza.state"))
 	{
 		ebalda.Grow();
-		ebalda.SaveState("jfgzoza.state1");
+		ebalda.Draw(OUT_FILE);
+		ebalda.SaveState("jfgzoza.state");
 	}
 }

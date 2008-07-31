@@ -26,7 +26,9 @@ class Ebalda
 		short endrow, endcol;
 
 		void allocate_himself();
+#ifdef DEBUG
 		void dump();
+#endif
 };
 
 #endif
