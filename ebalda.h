@@ -9,7 +9,7 @@ class Ebalda
 		~Ebalda();
 		
 		void Hatch(const char *name);       ///< Hatch a fresh new ebalda with a \c name.
-		void LoadState(const char *fname);  ///< Load ebalda from file.
+		bool LoadState(const char *fname);  ///< Load ebalda from file.
 		void SaveState(const char *fname);  ///< Save ebalda to file.
 
 		void Grow();

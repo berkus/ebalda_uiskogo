@@ -28,6 +28,8 @@ void Ebalda::allocate_himself()
 	if (width > 0 && height > 0)
 	{
 		ebalda_himself = new char [ (width + 2) * (height + 2) ];
+		if (!ebalda_himself)
+			abort(); // Хуякс!!
 		memset(ebalda_himself, 'A', (width + 2) * (height + 2));
 	}
 }
@@ -60,12 +62,57 @@ void Ebalda::Hatch(const char *n)
 //   width*height bytes field
 
 // Load ebalda from file.
-void Ebalda::LoadState(const char *fname)
+bool Ebalda::LoadState(const char *fname)
 {
+	short temp = 0;
+	char buf[6];
+
+	FILE *file = fopen(fname, "rb");
+	if (!file)
+		return false;
+
+	fread(buf, 6, 1, file);
+	if (strncmp(buf, "EBAlDA", 6))
+		return false;
+
+	fread(&temp, 1, 1, file); // NOT PORTABLE
+	if (temp == 0)
+		return false;
+	name = new char [temp];
+	if (!name)
+		return false;
+
+	fread(name, temp, 1, file);
+	fread(&step, 4, 1, file);
+	fread(&headrow, 2, 1, file);
+	fread(&headcol, 2, 1, file);
+	fread(&width, 2, 1, file);
+	fread(&height, 2, 1, file);
+	allocate_himself();
+
 	startrow = startcol = 1;
 	endrow = width;
 	endcol = height;
 	grown = false;
+	if (headrow == 0) headrow = 1;
+	if (headcol == 0) headcol = 1;
+
+	// Now the funky read loop.
+	for(int row = startrow; row <= endrow; row++)
+	  fread(&ebalda_himself[ (width + 2) * row + startcol ], endcol - startcol + 1, 1, file);
+
+	fclose(file);
+
+	fprintf(stderr, "Loaded field:\n");
+	for(int row = startrow; row <= endrow; row++)
+	{
+	  for(int col = startcol; row <= endcol; col++)
+		  fprintf(stderr, "%c", (row == headrow && col == headcol) ? '*' : ebalda_himself[ (width * 2) * row + col ]);
+		fprintf(stderr, "\n");
+	}
+	fprintf(stderr, "\n");
+
+	return true;
 }
 
 // Save ebalda to file.
@@ -91,6 +138,18 @@ void Ebalda::SaveState(const char *fname)
 	// Now the funky write loop.
 	for(int row = startrow; row <= endrow; row++)
 	  fwrite(&ebalda_himself[ (width + 2) * row + startcol ], endcol - startcol + 1, 1, file);
+
+	fclose(file);
+
+	fprintf(stderr, "Transformed field:\n");
+	for(int row = startrow; row <= endrow; row++)
+	{
+	  for(int col = startcol; row <= endcol; col++)
+		  fprintf(stderr, "%c", (row == headrow && col == headcol) ? '*' : ebalda_himself[ (width * 2) * row + col ]);
+		fprintf(stderr, "\n");
+	}
+	fprintf(stderr, "\n");
+
 }
 
 void Ebalda::Grow()
@@ -121,7 +180,7 @@ void Ebalda::Grow()
 	}
 
 	char *p = &ebalda_himself[ (width + 2) * headrow + headcol ];
-	*p++;
+	(*p)++;
 	if (*p > 'Y') *p = 'Y';
 
 	step++;

@@ -2,11 +2,7 @@
 #include <sys/time.h>
 #include <stdlib.h>
 
-// Run: ebalda new "Name" filename.dmp
-// or
-// ebalda filename.dmp
-
-int main(int argc, char **argv)
+int main(int, char **)
 {
 	// Seed RNG.
 	timeval tt;
@@ -14,7 +10,13 @@ int main(int argc, char **argv)
 	srand(tt.tv_usec);
 
 	Ebalda ebalda;
-	ebalda.Hatch("Jfgzoza");
-	ebalda.Grow();
-	ebalda.SaveState("jfgzoza.state");
+
+// 	ebalda.Hatch("Jfgzoza"); // uncomment these two lines to make a new one
+// 	ebalda.SaveState("jfgzoza.state");
+
+	if (ebalda.LoadState("jfgzoza.state"))
+	{
+		ebalda.Grow();
+		ebalda.SaveState("jfgzoza.state");
+	}
 }
