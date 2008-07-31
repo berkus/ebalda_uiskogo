@@ -257,7 +257,15 @@ void Ebalda::Draw(const char *outfile)
 
     pngout = fopen(outfile, "wb");
     gdImagePng(im, pngout);
-    
     fclose(pngout);
+
+    if (step % SCREENSHOT_EACH == 0)
+    {
+	snprintf(buf, 512, "%s/%08d.png", SCREENSHOT_DIR, step);
+	pngout = fopen(buf, "wb");
+	gdImagePng(im, pngout);
+	fclose(pngout);
+    }
+
     gdImageDestroy(im);
 }
