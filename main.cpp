@@ -18,6 +18,6 @@ int main(int, char **)
 	if (ebalda.LoadState("jfgzoza.state"))
 	{
 		ebalda.Grow();
-		ebalda.SaveState("jfgzoza.state");
+		ebalda.SaveState("jfgzoza.state1");
 	}
 }

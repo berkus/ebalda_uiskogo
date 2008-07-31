@@ -46,11 +46,14 @@ void Ebalda::dump()
 					headrow, headcol,
 					startrow, startcol,
 					endrow, endcol);
-	for(int row = startrow; row <= endrow; row++)
+	for(int row = 0; row < height+2; row++)
+//	for(int row = startrow; row <= endrow; row++)
 	{
-	  for(int col = startcol; col <= endcol; col++)
+	    fprintf(stderr, "Row %02d: ", row);
+	  for(int col = 0; col < width+2; col++)
+//	  for(int col = startcol; col <= endcol; col++)
 	  {
-		char c = ebalda_himself[ (width * 2) * row + col ];
+		char c = ebalda_himself[ (width + 2) * row + col ];
 		fprintf(stderr, "%c", (row == headrow && col == headcol) ? toupper(c) : tolower(c));
 	  }
 		fprintf(stderr, "\n");
@@ -122,9 +125,15 @@ bool Ebalda::LoadState(const char *fname)
 	if (headrow == 0) headrow = 1;
 	if (headcol == 0) headcol = 1;
 
+	fprintf(stderr, "**BEFORE LOAD**\n");
+	dump();
+
 	// Now the funky read loop.
 	for(int row = startrow; row <= endrow; row++)
+	{
+	    fprintf(stderr, "reading at %d for %d\n",(width + 2) * row + startcol, endcol - startcol + 1);
 	  fread(&ebalda_himself[ (width + 2) * row + startcol ], endcol - startcol + 1, 1, file);
+	}
 
 	fclose(file);
 
