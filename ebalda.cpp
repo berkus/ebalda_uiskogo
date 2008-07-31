@@ -34,6 +34,22 @@ void Ebalda::allocate_himself()
 	}
 }
 
+void Ebalda::dump()
+{
+	fprintf(stderr, "Wild ebalda: %s @ %d (%d)\n"
+	                " Head @ %d x %d\n"
+					" Width %d x %d\n"
+					" Start @ %d x %d\n"
+					" End @ %d x %d\n", name, step, grown, headrow, headcol, width, height, startrow, startcol, endrow, endcol);
+	for(int row = startrow; row <= endrow; row++)
+	{
+	  for(int col = startcol; col <= endcol; col++)
+		  fprintf(stderr, "%c", (row == headrow && col == headcol) ? '*' : ebalda_himself[ (width * 2) * row + col ]);
+		fprintf(stderr, "\n");
+	}
+	fprintf(stderr, "\n");
+}
+
 // Hatch a fresh new ebalda with a name.
 void Ebalda::Hatch(const char *n)
 {
@@ -103,14 +119,8 @@ bool Ebalda::LoadState(const char *fname)
 
 	fclose(file);
 
-	fprintf(stderr, "Loaded field:\n");
-	for(int row = startrow; row <= endrow; row++)
-	{
-	  for(int col = startcol; col <= endcol; col++)
-		  fprintf(stderr, "%c", (row == headrow && col == headcol) ? '*' : ebalda_himself[ (width * 2) * row + col ]);
-		fprintf(stderr, "\n");
-	}
-	fprintf(stderr, "\n");
+	fprintf(stderr, "**LOADED**\n");
+	dump();
 
 	return true;
 }
@@ -141,15 +151,8 @@ void Ebalda::SaveState(const char *fname)
 
 	fclose(file);
 
-	fprintf(stderr, "Transformed field:\n");
-	for(int row = startrow; row <= endrow; row++)
-	{
-	  for(int col = startcol; col <= endcol; col++)
-		  fprintf(stderr, "%c", (row == headrow && col == headcol) ? '*' : ebalda_himself[ (width * 2) * row + col ]);
-		fprintf(stderr, "\n");
-	}
-	fprintf(stderr, "\n");
-
+	fprintf(stderr, "**TRANSFORMED**\n");
+	dump();
 }
 
 void Ebalda::Grow()
@@ -184,6 +187,7 @@ void Ebalda::Grow()
 	if (*p > 'Y') *p = 'Y';
 
 	step++;
+	grown = true;
 }
 
 void Ebalda::Draw(const char *outfile)
